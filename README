@@ -1,0 +1,53 @@
+= Tyrannical
+
+An experimental modeling interface for Tokyo Tyrant using ActiveModel. Though the interface is meant be used with ActiveModel it is not meant to be ActiveRecord.  It is meant to provide an Ruby object to Tyrant table row interface with type casting and use ActiveModel for the other great stuff like validation, callbacks, etc.
+
+== Install
+
+gem sources -a http://gems.github.com
+sudo gem install actsasflinn-tyrannical
+
+== Example
+
+  Tyrannical.connection = TokyoTyrant::Table.new
+
+  class Example < Tyrannical
+    attribute :id, :integer
+    attribute :num, :integer
+    attribute :ord, :string
+    attribute :starts_at, :type => :time, :default => proc{ Time.now }
+
+    validates_presence_of :num
+    validates_numericality_of :num
+  end
+
+  # Create Example objects
+  50.times{ |i| Example.create(:num => i, :ord => i.ordinalize) }
+
+  # Get one by Key
+  Example[1]
+
+  # Get all
+  Example.all
+
+  # Get all by key 1, 3 and 4
+  Example.all(1, 3, 4)
+
+  # Get with a complex query
+  Example.all{ |query|
+    query.condition(:num, :numgt, 40)
+    query.order_by(:num)
+    query.limit(5)
+  }
+
+  # Count all
+  Example.count
+
+  # Count with a complex query
+  Example.count{ |q| q.condition(:num, :numgt, 40) }
+
+  # Destroy all
+  Example.destroy_all
+
+  # Destroy by key
+  Example.destroy(1,2,3)
